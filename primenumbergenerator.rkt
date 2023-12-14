@@ -58,11 +58,10 @@
   (cond
     ;[(not (natural? n)) (error "not a non-negative integer")]
     ;[(not (list-of-naturals? primes)) (error "not a list of naturals")]
-    [(= n 2) (cons 2 primes)]
-    [(empty? primes) (if (is-prime?
-                          n (prime-number-generator (- n 1) primes))
-                         (cons n (prime-number-generator (- n 1) primes))
-                         (prime-number-generator (- n 1) primes))]))
+    [(= n 2) (cons 2 primes)]   ; base case
+    [(is-prime? n (prime-number-generator (- n 1) primes))
+     (cons n (prime-number-generator (- n 1) primes))]  ; dumb
+    [else (prime-number-generator (- n 1) primes)])) ; really dumb
 ; checks
 (check-expect (prime-number-generator 2 '()) (cons 2 '()))
 (check-expect (prime-number-generator 3 '()) (cons 3 (cons 2 '())))
@@ -86,4 +85,4 @@
 
 ; actions
 
-(prime-number-generator 50 KNOWNPRIMES)
+(prime-number-generator 25 KNOWNPRIMES)
