@@ -56,26 +56,34 @@
   ; given a number and a list of known primes,
   ;     find all primes less than or equal to that number
   (cond
-    [(not (natural? n)) (error "not a non-negative integer")]
-    [(not (list-of-naturals? primes)) (error "not a list of naturals")]
+    ;[(not (natural? n)) (error "not a non-negative integer")]
+    ;[(not (list-of-naturals? primes)) (error "not a list of naturals")]
     [(= n 2) (cons 2 primes)]
-    [(empty? primes) (if (> n (first (prime-number-generator (- n 1) primes)))
-                         (prime-number-generator (- n 1) primes) primes)]
-    [else (if (is-prime? n primes) (cons n primes) primes)]))
+    [(empty? primes) (if (is-prime?
+                          n (prime-number-generator (- n 1) primes))
+                         (cons n (prime-number-generator (- n 1) primes))
+                         (prime-number-generator (- n 1) primes))]))
 ; checks
-(check-expect (prime-number-generator 6 '()) (cons 3 (cons 2 '())))
+(check-expect (prime-number-generator 2 '()) (cons 2 '()))
+(check-expect (prime-number-generator 3 '()) (cons 3 (cons 2 '())))
+(check-expect (prime-number-generator 4 '()) (cons 3 (cons 2 '())))
+(check-expect (prime-number-generator 6 '()) (cons 5 (cons 3 (cons 2 '()))))
 
-(define (is-prime? n list)
-  ; Natural ListOfNaturals -> Boolean
+
+(define (is-prime? n primes)
+  ; Natural ListOfNaturals ->  Boolean
   ; given a number and a list of known primes,
   ;     determines if that number is itself a prime
-  (or
-   (empty? list)    ; list MUST be empty if a prime
-   (not (or
-         (= 0 (modulo n (first list)))
-         (not (is-prime? n (rest list)))))))
+  (cond
+    [(empty? primes) #t]
+    [(= 0 (modulo n (first primes))) #f]
+    [else (is-prime? n (rest primes))]))
 ; checks
+(check-expect (is-prime? 2 '()) #t)
+(check-expect (is-prime? 3 (cons 2 '())) #t)
 (check-expect (is-prime? 5 (cons 3 (cons 2 '()))) #t)
 (check-expect (is-prime? 6 (cons 3 (cons 2 '()))) #f)
 
 ; actions
+
+(prime-number-generator 50 KNOWNPRIMES)
