@@ -46,7 +46,7 @@
   ; Natural -> ListOfNaturals
   ; given a number n, finds all primes less than or equal to that number
   (cond
-    [(= n 2) (cons 2 '())]
+    [(= n 2) (prime-sequence-constructor n '())]
     [else (prime-sequence-constructor n (prime-number-generator (- n 1)))]))
 ; checks
 (check-expect (prime-number-generator 2) (cons 2 '()))
@@ -74,14 +74,15 @@
   ;     determines if that number is itself a prime
   (or
    (empty? primes)
+   (< n (sqr (first primes)))
    (and
     (not (= 0 (modulo n (first primes))))
     (is-prime? n (rest primes)))))
 ; checks
 (check-expect (is-prime? 2 '()) #t)
 (check-expect (is-prime? 3 (cons 2 '())) #t)
-(check-expect (is-prime? 5 (cons 3 (cons 2 '()))) #t)
-(check-expect (is-prime? 6 (cons 3 (cons 2 '()))) #f)
+(check-expect (is-prime? 5 (cons 2 (cons 3 '()))) #t)
+(check-expect (is-prime? 6 (cons 2 (cons 3 '()))) #f)
 
 
 (define (snoc n list)
