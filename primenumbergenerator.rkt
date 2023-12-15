@@ -60,16 +60,23 @@
   ; if the given n is prime, it prepends n to the list of known primes,
   ;    otherwise the list of known primes is unchanged
   (if (is-prime? n primes) (cons n primes) primes))
-
+; checks
+(check-expect (prime-sequence-constructor
+               2 '()) (cons 2 '()))
+(check-expect (prime-sequence-constructor
+               3 (cons 2 '())) (cons 3 (cons 2 '())))
+(check-expect (prime-sequence-constructor
+               4 (cons 3 (cons 2 '()))) (cons 3 (cons 2 '())))
 
 (define (is-prime? n primes)
   ; Natural ListOfNaturals ->  Boolean
   ; given a number and a list of known primes,
   ;     determines if that number is itself a prime
-  (cond
-    [(empty? primes) #t]
-    [(= 0 (modulo n (first primes))) #f]
-    [else (is-prime? n (rest primes))]))
+  (or
+   (empty? primes)
+   (and
+    (not (= 0 (modulo n (first primes))))
+    (is-prime? n (rest primes)))))
 ; checks
 (check-expect (is-prime? 2 '()) #t)
 (check-expect (is-prime? 3 (cons 2 '())) #t)
