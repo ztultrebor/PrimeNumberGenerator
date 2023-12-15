@@ -10,7 +10,7 @@
 (check-expect (natural? 0) #t)
 (check-expect (natural? 2) #t)
 (check-expect (natural? -2) #f)
-(check-expect (natural? 3.14) #f)
+(check-expect (natural? pi) #f)
 (check-expect (natural? "zero") #f)
 #;
 (define (fn-on-natural n)
@@ -29,7 +29,7 @@
 (check-expect (list-of-naturals? '()) #t)
 (check-expect (list-of-naturals? (cons 3 (cons 2 '()))) #t)
 (check-expect (list-of-naturals? (cons 3 (cons -2 '()))) #f)
-(check-expect (list-of-naturals? (cons 3.14 (cons 2 '()))) #f)
+(check-expect (list-of-naturals? (cons pi (cons 2 '()))) #f)
 #;
 (define (fn-on-list-of-naturals list)
   (cond
@@ -46,27 +46,27 @@
   ; Natural -> ListOfNaturals
   ; given a number n, finds all primes less than or equal to that number
   (cond
-    [(= n 2) (cons 2 '())]   ; base case
+    [(= n 2) (cons 2 '())]
     [else (prime-sequence-constructor n (prime-number-generator (- n 1)))]))
 ; checks
 (check-expect (prime-number-generator 2) (cons 2 '()))
-(check-expect (prime-number-generator 3) (cons 3 (cons 2 '())))
-(check-expect (prime-number-generator 4) (cons 3 (cons 2 '())))
-(check-expect (prime-number-generator 6) (cons 5 (cons 3 (cons 2 '()))))
+(check-expect (prime-number-generator 3) (cons 2 (cons 3 '())))
+(check-expect (prime-number-generator 4) (cons 2 (cons 3 '())))
+(check-expect (prime-number-generator 6) (cons 2 (cons 3 (cons 5 '()))))
 
 
 (define (prime-sequence-constructor n primes)
   ; Natural ListOfNaturals -> ListOfNaturals
   ; if the given n is prime, it prepends n to the list of known primes,
   ;    otherwise the list of known primes is unchanged
-  (if (is-prime? n primes) (cons n primes) primes))
+  (if (is-prime? n primes) (snoc n primes) primes))
 ; checks
 (check-expect (prime-sequence-constructor
                2 '()) (cons 2 '()))
 (check-expect (prime-sequence-constructor
-               3 (cons 2 '())) (cons 3 (cons 2 '())))
+               3 (cons 2 '())) (cons 2 (cons 3 '())))
 (check-expect (prime-sequence-constructor
-               4 (cons 3 (cons 2 '()))) (cons 3 (cons 2 '())))
+               4 (cons 2 (cons 3 '()))) (cons 2 (cons 3 '())))
 
 (define (is-prime? n primes)
   ; Natural ListOfNaturals ->  Boolean
@@ -82,6 +82,19 @@
 (check-expect (is-prime? 3 (cons 2 '())) #t)
 (check-expect (is-prime? 5 (cons 3 (cons 2 '()))) #t)
 (check-expect (is-prime? 6 (cons 3 (cons 2 '()))) #f)
+
+
+(define (snoc n list)
+; Natural ListOfNaturals -> ListOfNatorals
+;; appends a new element to a list, but from the inside out
+  (cond
+    [(empty? list) (cons n '())]
+    [else (cons (first list) (snoc n (rest list)))]))
+;checks
+(check-expect (snoc 3 (cons 2 '())) (cons 2 (cons 3 '())))
+(check-expect (snoc 5 (cons 2 (cons 3 '()))) (cons 2 (cons 3 (cons 5 '()))))
+
+
 
 ; actions
 
