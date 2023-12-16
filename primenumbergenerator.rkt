@@ -1,6 +1,8 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
 #reader(lib "htdp-beginner-reader.ss" "lang")((modname primenumbergenerator) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
+(require 2htdp/image)
+
 ; data definitions
 
 ; A Natural is a non-negative integer
@@ -46,7 +48,7 @@
   ; Natural -> ListOfNaturals
   ; given a number n, finds all primes less than or equal to that number
   (cond
-    [(= n 2) (prime-sequence-constructor n '())]
+    [(= n 2) (cons 2 '())]
     [else (prime-sequence-constructor n (prime-number-generator (- n 1)))]))
 ; checks
 (check-expect (prime-number-generator 2) (cons 2 '()))
@@ -62,8 +64,6 @@
   (if (is-prime? n primes) (snoc n primes) primes))
 ; checks
 (check-expect (prime-sequence-constructor
-               2 '()) (cons 2 '()))
-(check-expect (prime-sequence-constructor
                3 (cons 2 '())) (cons 2 (cons 3 '())))
 (check-expect (prime-sequence-constructor
                4 (cons 2 (cons 3 '()))) (cons 2 (cons 3 '())))
@@ -73,13 +73,11 @@
   ; given a number and a list of known primes,
   ;     determines if that number is itself a prime
   (or
-   (empty? primes)
    (< n (sqr (first primes)))
    (and
     (not (= 0 (modulo n (first primes))))
     (is-prime? n (rest primes)))))
 ; checks
-(check-expect (is-prime? 2 '()) #t)
 (check-expect (is-prime? 3 (cons 2 '())) #t)
 (check-expect (is-prime? 5 (cons 2 (cons 3 '()))) #t)
 (check-expect (is-prime? 6 (cons 2 (cons 3 '()))) #f)
@@ -96,7 +94,16 @@
 (check-expect (snoc 5 (cons 2 (cons 3 '()))) (cons 2 (cons 3 (cons 5 '()))))
 
 
+(define (prime-printer primes)
+  ;; ListOfNaturals -> String
+  ;;convert the list of primes into a string suitable for printing
+  (cond
+    [(empty? (rest primes)) (text (number->string (first primes)) 18 "green")]
+    [else (above (text (number->string (first primes)) 18 "green")
+                         (prime-printer (rest primes)))]))
+
+
 
 ; actions
 
-(prime-number-generator 1000)
+(prime-printer (prime-number-generator 10000))
