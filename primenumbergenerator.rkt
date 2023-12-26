@@ -1,6 +1,6 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "htdp-beginner-reader.ss" "lang")((modname primenumbergenerator) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
+#reader(lib "htdp-intermediate-reader.ss" "lang")((modname primenumbergenerator) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
 (require 2htdp/image)
 
 ; data definitions
@@ -45,34 +45,32 @@
 ; functions
 
 (define (prime-number-generator n)
-  ; Natural -> ListOfNaturals
+  ; Natural -> [ListOf Natural]
   ; given a number n, finds all primes less than or equal to that number
-  (cond
-    [(= n 2) (cons 2 '())]
-    [else (prime-sequence-constructor n (prime-number-generator (- n 1)))]))
+  (local (
+    (define primes
+      ; define primes--the function output--as a local variable
+      ; note that the value of primes is utilized twice every time this
+      ; function is called
+       (cond
+         [(= n 2) '()]
+         [else (prime-number-generator (- n 1))])))
+    (cond
+      [(is-prime? n primes) (snoc n primes)]
+      [else primes])))
 ; checks
-(check-expect (prime-number-generator 2) (cons 2 '()))
+(check-expect (prime-number-generator 2) (list 2))
 (check-expect (prime-number-generator 3) (cons 2 (cons 3 '())))
 (check-expect (prime-number-generator 4) (cons 2 (cons 3 '())))
 (check-expect (prime-number-generator 6) (cons 2 (cons 3 (cons 5 '()))))
 
-
-(define (prime-sequence-constructor n primes)
-  ; Natural ListOfNaturals -> ListOfNaturals
-  ; if the given n is prime, it prepends n to the list of known primes,
-  ;    otherwise the list of known primes is unchanged
-  (if (is-prime? n primes) (snoc n primes) primes))
-; checks
-(check-expect (prime-sequence-constructor
-               3 (cons 2 '())) (cons 2 (cons 3 '())))
-(check-expect (prime-sequence-constructor
-               4 (cons 2 (cons 3 '()))) (cons 2 (cons 3 '())))
 
 (define (is-prime? n primes)
   ; Natural ListOfNaturals ->  Boolean
   ; given a number and a list of known primes,
   ;     determines if that number is itself a prime
   (or
+   (empty? primes)
    (< n (sqr (first primes)))
    (and
     (not (= 0 (modulo n (first primes))))
@@ -84,8 +82,8 @@
 
 
 (define (snoc n list)
-; Natural ListOfNaturals -> ListOfNatorals
-;; appends a new element to a list, but from the inside out
+  ; Natural ListOfNaturals -> ListOfNatorals
+  ;; appends a new element to a list, but from the inside out
   (cond
     [(empty? list) (cons n '())]
     [else (cons (first list) (snoc n (rest list)))]))
@@ -94,16 +92,7 @@
 (check-expect (snoc 5 (cons 2 (cons 3 '()))) (cons 2 (cons 3 (cons 5 '()))))
 
 
-(define (prime-printer primes)
-  ;; ListOfNaturals -> String
-  ;;convert the list of primes into a string suitable for printing
-  (cond
-    [(empty? (rest primes)) (text (number->string (first primes)) 18 "green")]
-    [else (above (text (number->string (first primes)) 18 "green")
-                         (prime-printer (rest primes)))]))
-
-
 
 ; actions
 
-(prime-printer (prime-number-generator 10000))
+(prime-number-generator 50000)
