@@ -48,13 +48,15 @@
   ; Natural -> [ListOf Natural]
   ; given a number n, finds all primes less than or equal to that number
   (local (
-    (define primes
-      ; define primes--the function output--as a local variable
-      ; note that the value of primes is utilized twice every time this
-      ; function is called
-       (cond
-         [(= n 2) '()]
-         [else (prime-number-generator (- n 1))])))
+          (define primes
+            ; primes--the function output--is defined as a local variable.
+            ; Note that the value of primes is utilized twice every time this
+            ; function is called. The local definition really helps simplify the
+            ; recursion
+            (cond
+              [(= n 2) '()]
+              [else (prime-number-generator (- n 1))])))
+    ; - IN -
     (cond
       [(is-prime? n primes) (snoc n primes)]
       [else primes])))
@@ -66,7 +68,7 @@
 
 
 (define (is-prime? n primes)
-  ; Natural ListOfNaturals ->  Boolean
+  ; Natural [ListOf Natural] ->  Boolean
   ; given a number and a list of known primes,
   ;     determines if that number is itself a prime
   (or
@@ -82,7 +84,7 @@
 
 
 (define (snoc n list)
-  ; Natural ListOfNaturals -> ListOfNatorals
+  ; Natural [ListOf Natural] -> [ListOf Natural]
   ;; appends a new element to a list, but from the inside out
   (cond
     [(empty? list) (cons n '())]
@@ -95,4 +97,4 @@
 
 ; actions
 
-(prime-number-generator 50000)
+(prime-number-generator 100000)
